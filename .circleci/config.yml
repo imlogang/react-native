@@ -46,7 +46,7 @@ references:
   #        Dependency Anchors
   # -------------------------
   dependency_versions:
-    xcode_version: &xcode_version "14.3.0"
+    xcode_version: &xcode_version "14.2.0"
     nodelts_image: &nodelts_image "cimg/node:18.12.1"
     nodeprevlts_image: &nodeprevlts_image "cimg/node:16.18.1"
 
@@ -128,7 +128,7 @@ executors:
     <<: *defaults
     macos:
       xcode: *xcode_version
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.large.gen1
     environment:
       - BUILD_FROM_SOURCE: true
 
@@ -186,9 +186,9 @@ commands:
               echo "rbenv found; Skipping installation"
             fi
 
-            brew reinstall libyaml
-            gem install psych -- --with-libyaml-dir=$(brew --prefix libyaml)
-            export RUBY_CONFIGURE_OPTS=--with-libyaml-dir=$(brew --prefix libyaml)
+            #brew reinstall libyaml
+            #gem install psych -- --with-libyaml-dir=$(brew --prefix libyaml)
+            #export RUBY_CONFIGURE_OPTS=--with-libyaml-dir=$(brew --prefix libyaml)
 
             # Install the right version of ruby
             if [[ -z "$(rbenv versions | grep << parameters.ruby_version >>)" ]]; then
@@ -196,12 +196,16 @@ commands:
               # some PRs received machines in a weird state, this should make the pipelines
               # more robust.
               brew update && brew upgrade ruby-build
+              echo "About to run rbenv install"
               rbenv install << parameters.ruby_version >>
             fi
 
             # Set ruby dependencies
+            echo "About to run rbenv global"
             rbenv global << parameters.ruby_version >>
-            gem install bundler
+            # echo "About to run gem install bundler"
+            # gem install bundler
+            echo "About to run bundle check"
             bundle check || bundle install --path vendor/bundle --clean
       - save_cache:
           key: *rbenv_cache_key
