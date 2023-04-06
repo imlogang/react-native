@@ -171,6 +171,7 @@ commands:
       - restore_cache:
           key: *rbenv_cache_key
       - run:
+          shell: /bin/zsh --login -eo pipefail
           name: Bundle Install
           command: |
             # Check if rbenv is installed. CircleCI is migrating to rbenv so we may not need to always install it.
